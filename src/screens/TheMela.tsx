@@ -11,7 +11,7 @@ const melaActivities = [
 
 export default function TheMela() {
   const { state, dispatch, navigate } = useGame();
-  const [completed, setCompleted] = useState<string[]>([]);
+  const [completed, setCompleted] = useState<string[]>(state.melaCompletedStalls);
   const [currentActivity, setCurrentActivity] = useState<string | null>(null);
   const [gamePhase, setGamePhase] = useState<'browse' | 'playing' | 'done'>('browse');
   const [choice, setChoice] = useState<string | null>(null);
@@ -23,13 +23,19 @@ export default function TheMela() {
   }
 
   function completeActivity(actId: string, points: number) {
-    setCompleted(c => [...c, actId]);
+    const newCompleted = [...completed, actId];
+    setCompleted(newCompleted);
+    dispatch({ type: 'SET_MELA_STALLS', stalls: newCompleted });
     setGamePhase('browse');
     setCurrentActivity(null);
 
-    if (completed.length + 1 >= melaActivities.length) {
+    if (newCompleted.length >= melaActivities.length) {
       dispatch({ type: 'ADVANCE_STORM', amount: 8 });
       dispatch({ type: 'EARN_REWARD', coins: 20, stars: 3, message: 'Mela complete! 🎪' });
+      dispatch({ type: 'COMPLETE_ACTIVITY', activity: { id: Date.now().toString(), type: 'theMela', completedAt: new Date().toISOString(), accuracy: 100 } });
+      if (!state.unlockedCreatures.some(c => c.id === 'festival')) {
+        dispatch({ type: 'UNLOCK_CREATURE', creature: { id: 'festival', name: 'Fest', emoji: '🎪', unlockedAt: 'The Mela' } });
+      }
       setTimeout(() => navigate('melaReport'), 500);
     }
   }

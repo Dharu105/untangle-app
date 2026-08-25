@@ -18,7 +18,7 @@ const pages = [
 ];
 
 export default function BookCorner() {
-  const { dispatch, navigate } = useGame();
+  const { dispatch, navigate, state } = useGame();
   const [pageIdx, setPageIdx] = useState(0);
   const [scanning, setScanning] = useState(false);
   const [scanned, setScanned] = useState(false);
@@ -67,6 +67,10 @@ export default function BookCorner() {
     dispatch({ type: 'UPDATE_READING_PROGRESS', delta: 8 });
     dispatch({ type: 'ADVANCE_STORM', amount: 4 });
     dispatch({ type: 'EARN_REWARD', coins: 5, stars: 2, message: 'Story explored! 📖' });
+    dispatch({ type: 'COMPLETE_ACTIVITY', activity: { id: Date.now().toString(), type: 'bookCorner', completedAt: new Date().toISOString(), accuracy: 100 } });
+    if (!state.unlockedCreatures.some(c => c.id === 'book')) {
+      dispatch({ type: 'UNLOCK_CREATURE', creature: { id: 'book', name: 'Pages', emoji: '📖', unlockedAt: 'Book Corner' } });
+    }
     navigate('reward');
   }
 

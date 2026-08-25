@@ -92,10 +92,10 @@ export default function Welcome() {
               <span style={{ fontSize: 16 }}>⛅</span>
               <span style={{ fontSize: 13, fontWeight: 700, color: '#4B9180' }}>Tangle Storm Status</span>
             </div>
-            <span style={{ fontSize: 13, fontWeight: 700, color: '#24313A' }}>30% cleared</span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: '#24313A' }}>{state.stormProgress}% cleared</span>
           </div>
           <div style={{ height: 10, background: '#F7DDD0', borderRadius: 999, overflow: 'hidden' }}>
-            <div style={{ width: '30%', height: '100%', background: 'linear-gradient(90deg, #4B9180, #8DC8B0)', borderRadius: 999, transition: 'width 1s ease' }}/>
+            <div style={{ width: `${state.stormProgress}%`, height: '100%', background: 'linear-gradient(90deg, #4B9180, #8DC8B0)', borderRadius: 999, transition: 'width 1s ease' }}/>
           </div>
           <p style={{ fontSize: 12, color: '#756B63', margin: '6px 0 0' }}>The village needs a hero — that's you! 🌟</p>
         </div>

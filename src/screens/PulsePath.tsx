@@ -1,5 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
-import { useGame } from '../context/GameContext';
+import { useState, useEffect, useRef } from 'react';import { useGame } from '../context/GameContext';
 import Mindy from '../components/Mindy';
 
 const patterns = [
@@ -20,6 +19,8 @@ export default function PulsePath() {
   const [mindyPos, setMindyPos] = useState(0);
   const [previewBeat, setPreviewBeat] = useState(-1);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const scoreRef = useRef(0);
+  scoreRef.current = score;
 
   const pat = patterns[patIdx];
 
@@ -58,10 +59,15 @@ export default function PulsePath() {
       }
       setTimeout(() => {
         if (patIdx + 1 >= patterns.length) {
-          const accuracy = Math.round((score / patterns.length) * 100);
-          dispatch({ type: 'UPDATE_SYLLABLE_ACCURACY', delta: 5 });
+          const finalScore = scoreRef.current;
+          const accuracy = Math.round((finalScore / patterns.length) * 100);
+          dispatch({ type: 'UPDATE_SYLLABLE_ACCURACY', delta: Math.round((accuracy - state.syllableAccuracy) * 0.3) });
           dispatch({ type: 'ADVANCE_STORM', amount: 5 });
-          dispatch({ type: 'EARN_REWARD', coins: 4 + score, stars: score >= 3 ? 3 : 2, message: `${score} beats matched!` });
+          dispatch({ type: 'EARN_REWARD', coins: 4 + finalScore, stars: finalScore >= 3 ? 3 : 2, message: `${finalScore} beats matched!` });
+          dispatch({ type: 'COMPLETE_ACTIVITY', activity: { id: Date.now().toString(), type: 'pulsePath', completedAt: new Date().toISOString(), accuracy } });
+          if (finalScore >= 3 && !state.unlockedCreatures.some(c => c.id === 'drum')) {
+            dispatch({ type: 'UNLOCK_CREATURE', creature: { id: 'drum', name: 'Drum', emoji: '🥁', unlockedAt: 'Pulse Path' } });
+          }
           navigate('reward');
         } else {
           setPatIdx(i => i + 1);

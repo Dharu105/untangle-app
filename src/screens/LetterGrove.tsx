@@ -48,6 +48,10 @@ export default function LetterGrove() {
       dispatch({ type: 'UPDATE_LETTER_ACCURACY', delta: Math.round((accuracy - state.letterAccuracy) * 0.3) });
       dispatch({ type: 'ADVANCE_STORM', amount: 5 });
       dispatch({ type: 'EARN_REWARD', coins: 4 + score, stars: score >= 4 ? 3 : score >= 2 ? 2 : 1, message: `${score} letter friends found! 🌳` });
+      dispatch({ type: 'COMPLETE_ACTIVITY', activity: { id: Date.now().toString(), type: 'letterGrove', completedAt: new Date().toISOString(), accuracy } });
+      if (score >= 4 && !state.unlockedCreatures.some(c => c.id === 'tree')) {
+        dispatch({ type: 'UNLOCK_CREATURE', creature: { id: 'tree', name: 'Oaky', emoji: '🌳', unlockedAt: 'Letter Grove' } });
+      }
       navigate('reward');
     } else {
       setRoundIdx(r => r + 1);

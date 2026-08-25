@@ -38,7 +38,7 @@ const mistakes = [
 ];
 
 export default function MindyMixup() {
-  const { dispatch, navigate } = useGame();
+  const { dispatch, navigate, state } = useGame();
   const [idx, setIdx] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const [phase, setPhase] = useState<'question' | 'teaching' | 'learned'>('question');
@@ -70,6 +70,10 @@ export default function MindyMixup() {
       if (idx + 1 >= mistakes.length) {
         dispatch({ type: 'ADVANCE_STORM', amount: 6 });
         dispatch({ type: 'EARN_REWARD', coins: 6 + cardsEarned, stars: 3, message: `${cardsEarned} lesson cards earned!` });
+        dispatch({ type: 'COMPLETE_ACTIVITY', activity: { id: Date.now().toString(), type: 'mindyMixup', completedAt: new Date().toISOString(), accuracy: Math.round((cardsEarned / mistakes.length) * 100) } });
+        if (!state.unlockedCreatures.some(c => c.id === 'owl')) {
+          dispatch({ type: 'UNLOCK_CREATURE', creature: { id: 'owl', name: 'Hoot', emoji: '🦉', unlockedAt: 'Mindy\'s House' } });
+        }
         navigate('reward');
       } else {
         setIdx(i => i + 1);

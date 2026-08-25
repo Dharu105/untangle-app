@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { useGame } from '../context/GameContext';
 import Mindy from '../components/Mindy';
 
@@ -13,12 +13,14 @@ const words = [
 type Phase = 'build' | 'flying' | 'wobbling';
 
 export default function KiteMeadow() {
-  const { dispatch, navigate } = useGame();
+  const { dispatch, navigate, state } = useGame();
   const [wordIdx, setWordIdx] = useState(0);
   const [slots, setSlots]     = useState<(string | null)[]>([null, null, null]);
   const [phase, setPhase]     = useState<Phase>('build');
   const [score, setScore]     = useState(0);
   const [kiteY, setKiteY]     = useState(80);
+  const scoreRef = useRef(0);
+  scoreRef.current = score;
 
   const word = words[wordIdx];
   const tiles = useMemo(() => [...word.answer].sort(() => Math.random() - 0.5), [wordIdx]);
@@ -46,9 +48,15 @@ export default function KiteMeadow() {
 
   function advance() {
     if (wordIdx + 1 >= words.length) {
-      dispatch({ type: 'UPDATE_SYLLABLE_ACCURACY', delta: 5 });
+      const finalScore = scoreRef.current;
+      const accuracy = Math.round((finalScore / words.length) * 100);
+      dispatch({ type: 'UPDATE_SYLLABLE_ACCURACY', delta: Math.round((accuracy - state.syllableAccuracy) * 0.3) });
       dispatch({ type: 'ADVANCE_STORM', amount: 5 });
-      dispatch({ type: 'EARN_REWARD', coins: 5 + score, stars: score >= 4 ? 3 : 2, message: `${score + (phase === 'flying' ? 1 : 0)} kites launched! 🪁` });
+      dispatch({ type: 'EARN_REWARD', coins: 5 + finalScore, stars: finalScore >= 4 ? 3 : 2, message: `${finalScore} kites launched! 🪁` });
+      dispatch({ type: 'COMPLETE_ACTIVITY', activity: { id: Date.now().toString(), type: 'kiteMeadow', completedAt: new Date().toISOString(), accuracy } });
+      if (finalScore >= 4 && !state.unlockedCreatures.some(c => c.id === 'kite')) {
+        dispatch({ type: 'UNLOCK_CREATURE', creature: { id: 'kite', name: 'Kitey', emoji: '🪁', unlockedAt: 'Kite Meadow' } });
+      }
       navigate('reward');
     } else {
       setWordIdx(i => i + 1);

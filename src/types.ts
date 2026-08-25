@@ -64,6 +64,22 @@ export interface Activity {
   accuracy: number;
 }
 
+export interface AppNotification {
+  id: string;
+  icon: string;
+  title: string;
+  body: string;
+  time: string;
+  read: boolean;
+}
+
+export interface Settings {
+  textSize: 1 | 2 | 3;
+  audio: boolean;
+  haptics: boolean;
+  highContrast: boolean;
+}
+
 export interface GameState {
   childName: string;
   childAge: number;
@@ -81,6 +97,7 @@ export interface GameState {
   stormProgress: number;
   melaProgress: number;
   melaUnlocked: boolean;
+  melaCompletedStalls: string[];
   completedActivities: Activity[];
   currentScreen: Screen;
   previousScreen: Screen;
@@ -89,6 +106,8 @@ export interface GameState {
   activeChildNav: 'home' | 'garden' | 'adventures' | 'mela' | 'profile';
   activeParentNav: 'home' | 'garden' | 'insights' | 'mela' | 'more';
   notificationsCount: number;
+  notifications: AppNotification[];
+  settings: Settings;
 }
 
 export type GameAction =
@@ -109,4 +128,14 @@ export type GameAction =
   | { type: 'UPDATE_READING_PROGRESS'; delta: number }
   | { type: 'ADVANCE_STORM'; amount: number }
   | { type: 'SET_CHILD_NAV'; tab: GameState['activeChildNav'] }
-  | { type: 'SET_PARENT_NAV'; tab: GameState['activeParentNav'] };
+  | { type: 'SET_PARENT_NAV'; tab: GameState['activeParentNav'] }
+  | { type: 'SET_TEXT_SIZE'; size: 1 | 2 | 3 }
+  | { type: 'TOGGLE_AUDIO' }
+  | { type: 'TOGGLE_HAPTICS' }
+  | { type: 'TOGGLE_CONTRAST' }
+  | { type: 'ADD_NOTIFICATION'; notification: AppNotification }
+  | { type: 'MARK_NOTIFICATION_READ'; id: string }
+  | { type: 'MARK_ALL_NOTIFICATIONS_READ' }
+  | { type: 'SET_MELA_STALLS'; stalls: string[] }
+  | { type: 'RESET_PROGRESS' }
+  | { type: 'HYDRATE'; state: GameState };

@@ -58,6 +58,9 @@ export default function SoundGarden() {
     dispatch({ type: 'ADVANCE_STORM', amount: 5 });
     dispatch({ type: 'EARN_REWARD', coins: 5 + score, stars: score >= 4 ? 3 : score >= 2 ? 2 : 1, message: `You untangled ${score} sounds! 🔊` });
     dispatch({ type: 'COMPLETE_ACTIVITY', activity: { id: Date.now().toString(), type: 'soundGarden', completedAt: new Date().toISOString(), accuracy } });
+    if (score >= 4 && !state.unlockedCreatures.some(c => c.id === 'bird')) {
+      dispatch({ type: 'UNLOCK_CREATURE', creature: { id: 'bird', name: 'Song', emoji: '🐦', unlockedAt: 'Sound Garden' } });
+    }
     navigate('reward');
   }
 
