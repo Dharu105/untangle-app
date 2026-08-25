@@ -1,0 +1,10 @@
+{
+  "description": "This interactive app engages children in a game-based learning environment to enhance reading skills, while providing parents with insightful progress tracking.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
